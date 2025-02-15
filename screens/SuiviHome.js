@@ -1,25 +1,62 @@
 import React, { useRef } from 'react';
-import { View, Text, ImageBackground, StyleSheet, TouchableOpacity, Animated, Linking, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Animated, Alert, Linking } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Ionicons } from '@expo/vector-icons'; // Import icons
+
+const Tab = createBottomTabNavigator();
 
 const SuiviHome = () => {
-    const scaleValue = useRef(new Animated.Value(1)).current;
+    return (
+        <Tab.Navigator
+            screenOptions={{
+                tabBarStyle: {
+                    backgroundColor: '#0A1F3A', // Dark blue background for the tab bar
+                    borderTopWidth: 0, // Remove the top border
+                },
+                tabBarActiveTintColor: '#1e90ff', // Active tab color
+                tabBarInactiveTintColor: '#fff', // Inactive tab color
+                headerShown: false, // Hide the header
+            }}
+        >
+            {/* Notification Tab */}
+            <Tab.Screen
+                name="Notifications"
+                component={NotificationsScreen}
+                options={{
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="notifications" size={size} color={color} />
+                    ),
+                }}
+            />
 
-    const onPressIn = () => {
-        Animated.spring(scaleValue, {
-            toValue: 0.9,
-            friction: 5,
-            useNativeDriver: true,
-        }).start();
-    };
+            {/* Emergency Call Tab */}
+            <Tab.Screen
+                name="Emergency"
+                component={EmergencyScreen}
+                options={{
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="call" size={size} color={color} />
+                    ),
+                }}
+            />
+        </Tab.Navigator>
+    );
+};
 
-    const onPressOut = () => {
-        Animated.spring(scaleValue, {
-            toValue: 1,
-            friction: 5,
-            useNativeDriver: true,
-        }).start();
-    };
+// Notification Screen
+const NotificationsScreen = () => {
+    return (
+        <ImageBackground source={require('../assets/images/background.jpg')} style={styles.background}>
+            <View style={styles.container}>
+                <Text style={styles.title}>Notifications</Text>
+                <Text style={styles.subtitle}>You have no new notifications.</Text>
+            </View>
+        </ImageBackground>
+    );
+};
 
+// Emergency Screen
+const EmergencyScreen = () => {
     const handleEmergencyCall = () => {
         Alert.alert(
             'Emergency Call',
@@ -31,44 +68,16 @@ const SuiviHome = () => {
         );
     };
 
-    const handleNotification = () => {
-        Alert.alert('Notification', 'You have a new notification!');
-    };
-
     return (
         <ImageBackground source={require('../assets/images/background.jpg')} style={styles.background}>
             <View style={styles.container}>
-                <Text style={styles.title}>Suivi Home</Text>
-                <Text style={styles.subtitle}>You are being tracked.</Text>
+                <Text style={styles.title}>Emergency Call</Text>
+                <Text style={styles.subtitle}>Press the button below to call for help.</Text>
 
-                {/* Buttons in a Row */}
-                <View style={styles.buttonContainer}>
-                    {/* Notification Button */}
-                    <TouchableOpacity
-                        onPress={handleNotification}
-                        onPressIn={onPressIn}
-                        onPressOut={onPressOut}
-                        activeOpacity={0.8}
-                        style={styles.button}
-                    >
-                        <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-                            <Text style={styles.buttonText}>Notification</Text>
-                        </Animated.View>
-                    </TouchableOpacity>
-
-                    {/* Emergency Call Button */}
-                    <TouchableOpacity
-                        onPress={handleEmergencyCall}
-                        onPressIn={onPressIn}
-                        onPressOut={onPressOut}
-                        activeOpacity={0.8}
-                        style={styles.button}
-                    >
-                        <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-                            <Text style={styles.buttonText}>Emergency Call</Text>
-                        </Animated.View>
-                    </TouchableOpacity>
-                </View>
+                {/* Emergency Call Button */}
+                <TouchableOpacity style={styles.emergencyButton} onPress={handleEmergencyCall}>
+                    <Ionicons name="call" size={32} color="#fff" />
+                </TouchableOpacity>
             </View>
         </ImageBackground>
     );
@@ -95,21 +104,12 @@ const styles = StyleSheet.create({
         color: '#fff',
         marginBottom: 40,
     },
-    buttonContainer: {
-        flexDirection: 'row', // Arrange buttons horizontally
-        justifyContent: 'space-between', // Add space between buttons
-        width: '80%', // Match the width of the buttons
-    },
-    button: {
-        backgroundColor: '#0A4F8A', // Darker blue
-        padding: 15,
-        borderRadius: 30, // Rounded corners
-        width: '48%', // Adjust width to fit two buttons in a row
+    emergencyButton: {
+        backgroundColor: '#ff4444', // Red color for emergency button
+        padding: 20,
+        borderRadius: 50, // Circular button
         alignItems: 'center',
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 18,
+        justifyContent: 'center',
     },
 });
 
