@@ -1,31 +1,37 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, ImageBackground, StyleSheet } from 'react-native';
 
 const SuiviHome = () => {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Suivi Home</Text>
-      <Text style={styles.subtitle}>You are being tracked.</Text>
-    </View>
-  );
+    return (
+        <ImageBackground source={require('../assets/images/background.jpg')} style={styles.background}>
+            <View style={styles.container}>
+                <Text style={styles.title}>Suivi Home</Text>
+                <Text style={styles.subtitle}>You are being tracked.</Text>
+            </View>
+        </ImageBackground>
+    );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#000',
-  },
-  title: {
-    fontSize: 24,
-    color: '#fff',
-    marginBottom: 20,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: '#fff',
-  },
+    background: {
+        flex: 1,
+        justifyContent: 'center',
+    },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    title: {
+        fontSize: 24,
+        color: '#fff',
+        marginBottom: 20,
+    },
+    subtitle: {
+        fontSize: 18,
+        color: '#fff',
+    },
 });
 
 export default SuiviHome;
