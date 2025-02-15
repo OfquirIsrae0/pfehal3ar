@@ -27,9 +27,6 @@ const GetStarted = ({ navigation }) => {
                 {/* Logo */}
                 <Image source={require('../assets/images/logo.png')} style={styles.logo} />
 
-                {/* Title */}
-                <Text style={styles.title}>Catracker</Text>
-
                 {/* Description */}
                 <Text style={styles.description}>Track your loved ones with ease and ensure their safety.</Text>
 
@@ -78,15 +75,9 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     logo: {
-        width: 100,
-        height: 100,
-        marginBottom: 20,
-    },
-    title: {
-        fontSize: 32,
-        color: '#fff',
-        fontWeight: 'bold',
-        marginBottom: 10,
+        width: 300, // Increased logo size
+        height: 300, // Increased logo size
+        marginBottom: 20, // Space between logo and description
     },
     description: {
         fontSize: 16,

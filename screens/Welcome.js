@@ -55,8 +55,8 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     logo: {
-        width: 100, // Adjust the width and height as needed
-        height: 100,
+        width: 300, // Adjust the width and height as needed
+        height: 300,
         marginBottom: 20, // Space between logo and subtitle
     },
     subtitle: {

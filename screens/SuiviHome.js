@@ -41,29 +41,34 @@ const SuiviHome = () => {
                 <Text style={styles.title}>Suivi Home</Text>
                 <Text style={styles.subtitle}>You are being tracked.</Text>
 
-                {/* Notification Button */}
-                <TouchableOpacity
-                    onPress={handleNotification}
-                    onPressIn={onPressIn}
-                    onPressOut={onPressOut}
-                    activeOpacity={0.8}
-                >
-                    <Animated.View style={[styles.button, { transform: [{ scale: scaleValue }] }]}>
-                        <Text style={styles.buttonText}>Notification</Text>
-                    </Animated.View>
-                </TouchableOpacity>
+                {/* Buttons in a Row */}
+                <View style={styles.buttonContainer}>
+                    {/* Notification Button */}
+                    <TouchableOpacity
+                        onPress={handleNotification}
+                        onPressIn={onPressIn}
+                        onPressOut={onPressOut}
+                        activeOpacity={0.8}
+                        style={styles.button}
+                    >
+                        <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+                            <Text style={styles.buttonText}>Notification</Text>
+                        </Animated.View>
+                    </TouchableOpacity>
 
-                {/* Emergency Call Button */}
-                <TouchableOpacity
-                    onPress={handleEmergencyCall}
-                    onPressIn={onPressIn}
-                    onPressOut={onPressOut}
-                    activeOpacity={0.8}
-                >
-                    <Animated.View style={[styles.button, { transform: [{ scale: scaleValue }] }]}>
-                        <Text style={styles.buttonText}>Emergency Call</Text>
-                    </Animated.View>
-                </TouchableOpacity>
+                    {/* Emergency Call Button */}
+                    <TouchableOpacity
+                        onPress={handleEmergencyCall}
+                        onPressIn={onPressIn}
+                        onPressOut={onPressOut}
+                        activeOpacity={0.8}
+                        style={styles.button}
+                    >
+                        <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+                            <Text style={styles.buttonText}>Emergency Call</Text>
+                        </Animated.View>
+                    </TouchableOpacity>
+                </View>
             </View>
         </ImageBackground>
     );
@@ -90,13 +95,17 @@ const styles = StyleSheet.create({
         color: '#fff',
         marginBottom: 40,
     },
+    buttonContainer: {
+        flexDirection: 'row', // Arrange buttons horizontally
+        justifyContent: 'space-between', // Add space between buttons
+        width: '80%', // Match the width of the buttons
+    },
     button: {
         backgroundColor: '#0A4F8A', // Darker blue
         padding: 15,
         borderRadius: 30, // Rounded corners
-        width: 200,
+        width: '48%', // Adjust width to fit two buttons in a row
         alignItems: 'center',
-        marginBottom: 20,
     },
     buttonText: {
         color: '#fff',
