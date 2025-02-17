@@ -1,25 +1,33 @@
-import React, { useRef } from 'react';
-import { View, Text, Image, ImageBackground, StyleSheet, Animated, TouchableOpacity, Alert } from 'react-native';
+import React, { useRef, useState, useEffect } from 'react'; // Assurez-vous que useRef est bien importé
+
+import { View, Text, Image, ImageBackground, StyleSheet, Animated, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons'; // For icons in the tabs
+import { Ionicons } from '@expo/vector-icons'; 
+import { getAuth } from 'firebase/auth';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
+
+import app from '../firebase'; // Assurez-vous d'avoir ce fichier pour initialiser Firebase
 
 const Tab = createBottomTabNavigator();
+const auth = getAuth(app);
+const db = getFirestore(app);
 
+// SuiveurHome avec la navigation
 const SuiveurHome = () => {
     return (
         <Tab.Navigator
-            initialRouteName="Map" // Set the "Map" tab as the default screen
+            initialRouteName="Map"
             screenOptions={{
                 tabBarStyle: {
-                    backgroundColor: '#0A1F3A', // Very dark blue for the footer
-                    borderTopWidth: 0, // Remove the top border
+                    backgroundColor: '#0A1F3A',
+                    borderTopWidth: 0,
                 },
-                tabBarActiveTintColor: '#1e90ff', // Active tab color
-                tabBarInactiveTintColor: '#fff', // Inactive tab color
+                tabBarActiveTintColor: '#1e90ff',
+                tabBarInactiveTintColor: '#fff',
                 headerStyle: {
-                    backgroundColor: '#0A1F3A', // Very dark blue for the header
+                    backgroundColor: '#0A1F3A',
                 },
-                headerTintColor: '#fff', // Header text color
+                headerTintColor: '#fff',
                 headerTitleStyle: {
                     fontWeight: 'bold',
                 },
@@ -27,7 +35,7 @@ const SuiveurHome = () => {
         >
             <Tab.Screen
                 name="Profile"
-                component={ProfileScreen}
+                component={ProfileScreen} // Affiche le Profil
                 options={{
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="person" size={size} color={color} />
@@ -74,7 +82,23 @@ const SuiveurHome = () => {
     );
 };
 
-// Modified Animated Button for Gravitational Effect
+// ProfileScreen affichant "Bonjour"
+const ProfileScreen = () => {
+    return (
+        <ImageBackground source={require('../assets/images/background.jpg')} style={styles.background}>
+            <AnimatedView>
+                <View style={styles.container}>
+                    <Image source={require('../assets/images/logo.png')} style={styles.logo} />
+                    <Text style={styles.title}>Profile</Text>
+                    {/* Affiche le texte "Bonjour" lorsqu'on clique sur le profil */}
+                    <Text style={styles.text}>Bonjour</Text>
+                </View>
+            </AnimatedView>
+        </ImageBackground>
+    );
+};
+
+// Animation pour le bouton
 const AnimatedView = ({ children }) => {
     const scaleValue = useRef(new Animated.Value(1)).current;
 
@@ -95,24 +119,11 @@ const AnimatedView = ({ children }) => {
     };
 
     return (
-        <TouchableOpacity
-            activeOpacity={1}
-            onPressIn={onPressIn}
-            onPressOut={onPressOut}
-        >
+        <TouchableOpacity activeOpacity={1} onPressIn={onPressIn} onPressOut={onPressOut}>
             <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
                 {children}
             </Animated.View>
         </TouchableOpacity>
-    );
-};
-
-// Alert for Mandatory Fields
-const showAlert = () => {
-    Alert.alert(
-        "Incomplete Input",
-        "Please fill in all the required fields!",
-        [{ text: "OK", onPress: () => console.log("OK Pressed") }]
     );
 };
 
@@ -122,17 +133,6 @@ const NotificationsScreen = () => (
             <View style={styles.container}>
                 <Image source={require('../assets/images/logo.png')} style={styles.logo} />
                 <Text style={styles.title}>Notifications</Text>
-            </View>
-        </AnimatedView>
-    </ImageBackground>
-);
-
-const ProfileScreen = () => (
-    <ImageBackground source={require('../assets/images/background.jpg')} style={styles.background}>
-        <AnimatedView>
-            <View style={styles.container}>
-                <Image source={require('../assets/images/logo.png')} style={styles.logo} />
-                <Text style={styles.title}>Profile</Text>
             </View>
         </AnimatedView>
     </ImageBackground>
@@ -190,7 +190,24 @@ const styles = StyleSheet.create({
     logo: {
         width: 100,
         height: 100,
-        marginBottom: 20, // Adjust spacing as necessary
+        marginBottom: 20,
+    },
+    profileInfo: {
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    text: {
+        fontSize: 18,
+        color: '#fff',
+        marginBottom: 5,
+    },
+    profilePic: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        marginBottom: 20,
     },
 });
 

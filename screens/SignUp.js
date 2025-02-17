@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ImageBackground, StyleSheet, Alert, Animated } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ImageBackground, StyleSheet, Alert, Animated, ActivityIndicator } from 'react-native';
+import { auth, firestore, createUserWithEmailAndPassword, doc, setDoc } from '../firebase'; // Importer les bons modules
 
 const SignUp = ({ navigation }) => {
     const [name, setName] = useState('');
@@ -7,47 +8,79 @@ const SignUp = ({ navigation }) => {
     const [password, setPassword] = useState('');
     const [phone, setPhone] = useState('');
     const [address, setAddress] = useState('');
+    const [loading, setLoading] = useState(false);
     const scaleValue = useRef(new Animated.Value(1)).current;
 
-    // Function to handle sign-up validation
-    const handleSignUp = () => {
+    const validateAndCorrectEmail = (email) => {
+        const corrections = {
+            "gmal.com": "gmail.com",
+            "gnail.com": "gmail.com",
+            "yaho.com": "yahoo.com",
+        };
+
+        let correctedEmail = email.trim().toLowerCase();
+
+        Object.keys(corrections).forEach((incorrectDomain) => {
+            if (correctedEmail.includes(incorrectDomain)) {
+                correctedEmail = correctedEmail.replace(incorrectDomain, corrections[incorrectDomain]);
+            }
+        });
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(correctedEmail) ? correctedEmail : null;
+    };
+
+    const handleSignUp = async () => {
         if (!name || !email || !password || !phone || !address) {
             Alert.alert('Error', 'Please fill all fields');
             return;
         }
 
-        // Validate email format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
+        const correctedEmail = validateAndCorrectEmail(email);
+        if (!correctedEmail) {
             Alert.alert('Error', 'Please enter a valid email address');
             return;
         }
+        setEmail(correctedEmail); // Mise à jour de l'email avec la correction
 
-        // Validate phone number length
         if (phone.length < 10) {
             Alert.alert('Error', 'Please enter a valid phone number');
             return;
         }
 
-        // Proceed to the Welcome page if all fields are valid
-        navigation.navigate('Welcome');
-    };
+        if (password.length < 6) {
+            Alert.alert('Error', 'Password must be at least 6 characters long');
+            return;
+        }
 
-    // Gravitational animation for button press
-    const onPressIn = () => {
-        Animated.spring(scaleValue, {
-            toValue: 0.95,
-            friction: 3,
-            useNativeDriver: true,
-        }).start();
-    };
+        try {
+            setLoading(true); // Activation du loader
 
-    const onPressOut = () => {
-        Animated.spring(scaleValue, {
-            toValue: 1,
-            friction: 3,
-            useNativeDriver: true,
-        }).start();
+            // Création de l'utilisateur dans Firebase Authentication
+            const userCredential = await createUserWithEmailAndPassword(auth, correctedEmail, password);
+            const user = userCredential.user;
+
+            // Ajouter l'utilisateur dans Firestore
+            const userRef = doc(firestore, "users", user.uid); // Utiliser le bon `firestore` au lieu de `db`
+            await setDoc(userRef, {
+                name: name,
+                email: correctedEmail,
+                phone: phone,
+                address: address,
+                createdAt: new Date(),
+            });
+
+            Alert.alert('Success', 'Account created successfully!');
+            navigation.navigate('Login'); // Rediriger vers la page de connexion
+        } catch (error) {
+            if (error.code === 'auth/email-already-in-use') {
+                Alert.alert('Error', 'Email is already in use. Please try another one.');
+            } else {
+                Alert.alert('Error', error.message);
+            }
+        } finally {
+            setLoading(false); // Désactivation du loader
+        }
     };
 
     return (
@@ -55,7 +88,6 @@ const SignUp = ({ navigation }) => {
             <View style={styles.container}>
                 <Text style={styles.title}>Sign Up</Text>
 
-                {/* Full Name Input */}
                 <TextInput
                     style={styles.input}
                     placeholder="Full Name"
@@ -63,8 +95,6 @@ const SignUp = ({ navigation }) => {
                     value={name}
                     onChangeText={setName}
                 />
-
-                {/* Email Input */}
                 <TextInput
                     style={styles.input}
                     placeholder="Email"
@@ -74,8 +104,6 @@ const SignUp = ({ navigation }) => {
                     keyboardType="email-address"
                     autoCapitalize="none"
                 />
-
-                {/* Password Input */}
                 <TextInput
                     style={styles.input}
                     placeholder="Password"
@@ -84,8 +112,6 @@ const SignUp = ({ navigation }) => {
                     value={password}
                     onChangeText={setPassword}
                 />
-
-                {/* Phone Number Input */}
                 <TextInput
                     style={styles.input}
                     placeholder="Phone Number"
@@ -94,8 +120,6 @@ const SignUp = ({ navigation }) => {
                     onChangeText={setPhone}
                     keyboardType="phone-pad"
                 />
-
-                {/* Address Input */}
                 <TextInput
                     style={styles.input}
                     placeholder="Address"
@@ -104,19 +128,16 @@ const SignUp = ({ navigation }) => {
                     onChangeText={setAddress}
                 />
 
-                {/* Sign Up Button with Gravitational Animation */}
                 <TouchableOpacity
                     onPress={handleSignUp}
-                    onPressIn={onPressIn}
-                    onPressOut={onPressOut}
+                    disabled={loading}
                     activeOpacity={0.8}
                 >
-                    <Animated.View style={[styles.button, { transform: [{ scale: scaleValue }] }]}>
-                        <Text style={styles.buttonText}>Sign Up</Text>
+                    <Animated.View style={[styles.button, { transform: [{ scale: scaleValue }] }]} >
+                        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Sign Up</Text>}
                     </Animated.View>
                 </TouchableOpacity>
 
-                {/* Already have an account? */}
                 <View style={styles.footer}>
                     <Text style={styles.footerText}>Already have an account? </Text>
                     <TouchableOpacity onPress={() => navigation.navigate('Login')}>
@@ -150,10 +171,10 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         backgroundColor: '#fff',
         borderRadius: 30,
-        color: '#000', // Ensure text is visible on white background
+        color: '#000',
     },
     button: {
-        backgroundColor: '#0A4F8A', // Darker blue
+        backgroundColor: '#0A4F8A',
         padding: 15,
         borderRadius: 30,
         width: '80%',
